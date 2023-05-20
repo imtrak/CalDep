@@ -27,7 +27,19 @@ constraint forall(i in 1..(number_of_dates-1)) (
 );
 
 % Add constraints for maximum permanence and maximum tour
+constraint forall (p in 1..n) (forall(i in 1..number_of_dates-(max))(
+  sum(j in i..i+max) (if Cal[j, p] > 0 then 1 else 0 endif) <= max /\
+  sum(j in i..i+max) (if Cal[j, p] < 0 then 1 else 0 endif) <= max
+));    
 
+% Add constraints for minimum permanence or minimun tour 
+constraint forall(date in 1..number_of_dates-1 where Cal[date, 1] < 0 /\ Cal[date+1, 1] > 0) (
+  date-(M_in-1) >= 1 /\ Cal[date, 1] < 0 /\ Cal[date-(M_in-1), 1] < 0 /\ not (date+1 >= number_of_dates)
+);
+
+constraint forall(date in 1..number_of_dates-1 where Cal[date, 1] > 0 /\ Cal[date+1, 1] < 0) (
+  date-(M_in-1) >= 1 /\ Cal[date, 1] > 0 /\ Cal[date-(M_in-1), 1] > 0 /\ not (date+1 >= number_of_dates)
+);
 
 % On each day half of the teams has to play as visitors a the other half as locals
 constraint forall(i in 1..number_of_dates) (
