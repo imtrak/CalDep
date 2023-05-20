@@ -33,12 +33,12 @@ constraint forall (p in 1..n) (forall(i in 1..number_of_dates-(max))(
 ));    
 
 % Add constraints for minimum permanence or minimun tour 
-constraint forall(date in 1..number_of_dates-1 where Cal[date, 1] < 0 /\ Cal[date+1, 1] > 0) (
-  date-(M_in-1) >= 1 /\ Cal[date, 1] < 0 /\ Cal[date-(M_in-1), 1] < 0 /\ not (date+1 >= number_of_dates)
+constraint forall(date in 1..number_of_dates-1, team in 1..n where Cal[date, team] < 0 /\ Cal[date+1, team] > 0) (
+  date-(min-1) >= 1 /\ Cal[date, team] < 0 /\ Cal[date-(min-1), team] < 0 /\ not (date+1 >= number_of_dates)
 );
 
-constraint forall(date in 1..number_of_dates-1 where Cal[date, 1] > 0 /\ Cal[date+1, 1] < 0) (
-  date-(M_in-1) >= 1 /\ Cal[date, 1] > 0 /\ Cal[date-(M_in-1), 1] > 0 /\ not (date+1 >= number_of_dates)
+constraint forall(date in 1..number_of_dates-1, team in 1..n where Cal[date, team] > 0 /\ Cal[date+1, team] < 0) (
+  date-(min-1) >= 1 /\ Cal[date, team] > 0 /\ Cal[date-(min-1), team] > 0 /\ not (date+1 >= number_of_dates)
 );
 
 % On each day half of the teams has to play as visitors a the other half as locals
@@ -71,3 +71,4 @@ var int: total_cost = sum(i in 1..number_of_dates, t in 1..n)(
 ) + sum(t in 1..n)( if Cal[1, t] < 0 then d[t, abs(Cal[1, t])] else d[t,t] endif );
 
 solve minimize total_cost;
+
