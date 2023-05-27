@@ -18,7 +18,7 @@ array[1..2*(n-1), 1..n] of var -n..n: Cal; %matriz of calendar
 set of int: values = 1..n;
 
 % If one team play as visitor the rival is a local and if plays as local the rival is a visitor
-constraint forall(i, j, k in 1..n) (((Cal[i,j] = k) -> (Cal[i,k] = -j)) /\ ((Cal[i,k] = -j) -> (Cal[i,j] = k)));
+constraint forall(j, k in 1..n, i in 1..number_of_dates) (((Cal[i,j] = k) -> (Cal[i,k] = -j)) /\ ((Cal[i,k] = -j) -> (Cal[i,j] = k)));
 
 % All posible values in calendar are existing teams
 constraint forall(i in 1..number_of_dates) (
