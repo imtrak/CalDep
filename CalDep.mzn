@@ -1,8 +1,15 @@
 %parameters
 int: n; %number of total teams
-array[1..n, 1..n] of int: d; %matriz of distances between teams
+constraint assert( n > 0, "Error: Debe haber por lo menos dos equipos");
+constraint assert( n mod 2 == 0, "Error: El numero de equipos debe ser par");
+
 int: min;
 int: max;
+constraint assert( min > 0, "Error: el minimo de tour o permanencia debe ser mayor que 0");
+constraint assert( max > 0, "Error: el maximo de tour o permanencia debe ser mayor que 0");
+constraint assert( min < max, "Error: el maximo de tour o permanencia debe ser mayor que el minimo de tour o permanencia");
+
+array[1..n, 1..n] of int: d; %matriz of distances between teams
 
 int: number_of_dates = 2*(n-1);
 
@@ -11,7 +18,7 @@ array[1..2*(n-1), 1..n] of var -n..n: Cal; %matriz of calendar
 set of int: values = 1..n;
 
 % If one team play as visitor the rival is a local and if plays as local the rival is a visitor
-constraint forall(i, j, k in 1..n) (((Cal[i,j] = k) -> (Cal[i,k] = -j)) /\ ((Cal[i,k] = -j) -> (Cal[i,j] = k)));
+constraint forall(j, k in 1..n, i in 1..number_of_dates) (((Cal[i,j] = k) -> (Cal[i,k] = -j)) /\ ((Cal[i,k] = -j) -> (Cal[i,j] = k)));
 
 % All posible values in calendar are existing teams
 constraint forall(i in 1..number_of_dates) (
@@ -33,12 +40,28 @@ constraint forall (p in 1..n) (forall(i in 1..number_of_dates-(max))(
 ));    
 
 % Add constraints for minimum permanence or minimun tour 
-constraint forall(date in 1..number_of_dates-1, team in 1..n where Cal[date, team] < 0 /\ Cal[date+1, team] > 0) (
-  date-(min-1) >= 1 /\ Cal[date, team] < 0 /\ Cal[date-(min-1), team] < 0 /\ not (date+1 >= number_of_dates)
+constraint forall(team in 1..n, date in 1..number_of_dates)(
+    exists(dateOne in 1..number_of_dates, dateTwo in 1..number_of_dates where dateOne <= date /\ dateTwo >= date)(
+        dateTwo - dateOne + 1 >= min
+        /\
+        forall(inRangeDate in dateOne..dateTwo)(
+          Cal[inRangeDate, team] > 0
+        )  
+        \/
+        forall(inRangeDate in dateOne..dateTwo)(
+          Cal[inRangeDate, team] < 0
+        )
+    )
 );
 
-constraint forall(date in 1..number_of_dates-1, team in 1..n where Cal[date, team] > 0 /\ Cal[date+1, team] < 0) (
-  date-(min-1) >= 1 /\ Cal[date, team] > 0 /\ Cal[date-(min-1), team] > 0 /\ not (date+1 >= number_of_dates)
+
+% for each team there has to be two matches, one as visitor and other as local
+constraint forall(team in values)(
+      forall(k in values where k != team)(
+            exists(dateOne in 1..number_of_dates, dateTwo in 1..number_of_dates)(
+              Cal[dateOne,team] == k /\ Cal[dateTwo,team] == -1*k
+            )
+      )
 );
 
 % On each day half of the teams has to play as visitors a the other half as locals
@@ -72,3 +95,6 @@ var int: total_cost = sum(i in 1..number_of_dates, t in 1..n)(
 
 solve minimize total_cost;
 
+output ["Total cost: \(total_cost)\n"];
+output [ if j == 1 then "\n" else " " endif ++ show(Cal[i, j]) 
+         | i in 1..number_of_dates, j in 1..n ];
