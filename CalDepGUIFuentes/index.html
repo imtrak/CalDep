@@ -1,0 +1,39 @@
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CalDep</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://use.fontawesome.com/3a2eaf6206.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/minizinc/dist/minizinc.js"></script>
+    <script src="./main.js"></script>
+</head>
+
+<body>
+    <div class="submit_form">
+        <div class="formulario">
+            <form action="#" data-bitwarden-watching="1" onsubmit="runModel(event)">
+                <p>
+                    <label for="inputLabel">INPUTS
+                    </label>
+                    <label for="input" class="drop-container">
+                        <span class="drop-title">DROP FILES HERE!</span>
+                        or
+                        <input type="file" id="inputFile" name="inputFile" accept=".dzn" required>
+                    </label>
+                    <button type="submit" name="submit" id="submit">
+                        <p>SOLVE PROBLEM</p>
+                    </button>
+                </p>
+                <p>
+                    <label for="outputs" class="colocar_mensaje">OUTPUTS
+                    </label>
+                    <textarea name="outputs" id="outputs" ></textarea>
+                </p>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>
